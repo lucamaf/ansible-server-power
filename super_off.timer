@@ -1,0 +1,10 @@
+[Unit]
+Description=Run super_off ansible playbook daily at night
+
+[Timer]
+OnCalendar=Mon..Thu 00:20:00 Europe/Paris
+OnCalendar=Fri..Sun 22:00:00 Europe/Paris
+Unit=super_off.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,70 @@
+---
+- name: OCP host on with IPMI
+  hosts: ipmi_hosts
+  become: true
+  gather_facts: no
+  vars:
+    ipmi_user: ADMIN
+    ipmi_pass: password
+    ipmi_host: 192.168.1.31  # Replace with the BMC/IPMI IP of the target host
+    ssh_host: 192.168.1.247   # IP of the actual host after it boots
+    ssh_user: luca        # Username for SSH
+
+  tasks:
+    - name: Power on the host via IPMI
+      delegate_to: localhost
+      become: false
+      shell: >
+        ipmitool -I lanplus -H {{ ipmi_host }} -U {{ ipmi_user }} -P {{ ipmi_pass }} chassis power on
+      register: ipmi_poweron
+      changed_when: "'Up/On' not in ipmi_poweron.stdout"
+
+    - name: Wait for host to become reachable via SSH
+      wait_for:
+        host: "{{ ssh_host }}"
+        port: 22
+        timeout: 300
+        state: started
+      delegate_to: localhost
+
+- name: Startup all VMs on OCP hosts
+  hosts: ocp_hosts
+  become: true
+  gather_facts: no
+
+  tasks:
+    - name: Pause for 1 minute to wait for ssh daemon to allow auth
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Get list of defined but inactive VMs
+      shell: virsh list --name --inactive
+      register: inactive_vms
+      changed_when: false
+      retries: 10
+      delay: 10
+
+    - name: Start all inactive VMs
+      shell: virsh start {{ item }}
+      loop: "{{ inactive_vms.stdout_lines }}"
+      when: item != ""
+
+    - name: Pause for 2 minutes to wait for OCP API
+      ansible.builtin.pause:
+        minutes: 2
+
+    - name: Call API to turn on monitoring
+      uri:
+        url: "https://api.uptimerobot.com/v2/editMonitor"
+        method: POST
+        headers:
+          Authorization: "u152655-1f9527cfec215e6c9f2fa739"
+          Content-Type: "application/x-www-form-urlencoded"
+          Cache-Control: "no-cache"
+        body: 
+          api_key: u152655-1f9527cfec215e6c9f2fa739
+          format: json
+          id: 797243183
+          status: 1
+        body_format: form-urlencoded
+        status_code: 200
