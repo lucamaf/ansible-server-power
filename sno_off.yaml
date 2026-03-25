@@ -1,10 +1,8 @@
 ---
 - name: Gracefully shutdown host
   hosts: sno_hosts
-  become: true
+  become: false
   gather_facts: no
-  vars:
-    ansible_user: luca
 
   tasks:
     - name: Skip VM shutdown (no VMs on this host)
@@ -30,6 +28,9 @@
       become: false
 
     - name: Shutdown the host
+      become: true
       shell: shutdown -h now
       async: 1
       poll: 0
+      vars:
+        ansible_user: core
