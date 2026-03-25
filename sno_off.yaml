@@ -1,0 +1,35 @@
+---
+- name: Gracefully shutdown host
+  hosts: sno_hosts
+  become: true
+  gather_facts: no
+  vars:
+    ansible_user: luca
+
+  tasks:
+    - name: Skip VM shutdown (no VMs on this host)
+      debug:
+        msg: "No VMs to shutdown on this host"
+
+    - name: Call API to turn off monitoring
+      uri:
+        url: "https://api.uptimerobot.com/v2/editMonitor"
+        method: POST
+        headers:
+          Authorization: "u152655-1f9527cfec215e6c9f2fa739"
+          Content-Type: "application/x-www-form-urlencoded"
+          Cache-Control: "no-cache"
+        body: 
+          api_key: u152655-1f9527cfec215e6c9f2fa739
+          format: json
+          id: 802634135
+          status: 0
+        body_format: form-urlencoded
+        status_code: 200
+      delegate_to: localhost
+      become: false
+
+    - name: Shutdown the host
+      shell: shutdown -h now
+      async: 1
+      poll: 0

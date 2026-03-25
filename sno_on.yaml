@@ -1,0 +1,28 @@
+---
+- name: Wake up host via WOL
+  hosts: localhost
+  become: false
+  gather_facts: no
+  vars:
+    wol_mac: a4:bb:6d:ab:d3:50
+    ssh_host: 192.168.1.16
+    ssh_user: core
+
+  tasks:
+    - name: Send WOL magic packet to wake up the host
+      shell: >
+        wol {{ wol_mac }}
+      register: wol_result
+      changed_when: "'Sending the magic packet' in wol_result.stdout or wol_result.rc == 0"
+
+    - name: Wait for host to become reachable via SSH
+      wait_for:
+        host: "{{ ssh_host }}"
+        port: 22
+        timeout: 300
+        state: started
+      delegate_to: localhost
+
+    - name: Skip VM startup
+      debug:
+        msg: "No VMs configured on this host"
