@@ -1,9 +1,9 @@
 [Unit]
-Description=Run sno_off ansible playbook daily at night
+Description=Run osbuild_off ansible playbook daily at night
 
 [Timer]
 OnCalendar=Mon..Fri 18:30:00 Europe/Paris
-Unit=sno_off.service
+Unit=osbuild_off.service
 
 [Install]
 WantedBy=timers.target

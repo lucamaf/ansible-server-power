@@ -1,0 +1,11 @@
+---
+- name: Gracefully shutdown osbuild host
+  hosts: osbuild_hosts
+  become: true
+  gather_facts: no
+
+  tasks:
+    - name: Shutdown the host
+      shell: shutdown -h now
+      async: 1
+      poll: 0
