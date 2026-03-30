@@ -2,7 +2,7 @@
 Description=Run osbuild_off ansible playbook daily at night
 
 [Timer]
-OnCalendar=Mon..Fri 18:30:00 Europe/Paris
+OnCalendar=Mon..Sun 18:30:00 Europe/Paris
 Unit=osbuild_off.service
 
 [Install]

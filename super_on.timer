@@ -3,7 +3,7 @@ Description=Run super_on ansible playbook daily in the morning
 
 [Timer]
 OnCalendar=Mon..Fri 8:00:00 Europe/Paris
-OnCalendar=Sat,Sun 11:30:00 Europe/Paris
+#OnCalendar=Sat,Sun 11:30:00 Europe/Paris
 Unit=super_on.service
 
 [Install]
