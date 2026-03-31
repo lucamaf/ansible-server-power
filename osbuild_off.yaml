@@ -6,6 +6,6 @@
 
   tasks:
     - name: Shutdown the host
-      shell: shutdown -h now
+      shell: poweroff
       async: 1
       poll: 0

@@ -15,6 +15,10 @@
       register: wol_result
       changed_when: "'Sending the magic packet' in wol_result.stdout or wol_result.rc == 0"
 
+    - name: Wait 60 seconds for WOL wake-up to complete and boot sequence to start
+      pause:
+        seconds: 60
+
     - name: Wait for host to become reachable via SSH
       wait_for:
         host: "{{ ssh_host }}"

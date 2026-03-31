@@ -19,6 +19,10 @@
       register: ipmi_poweron
       changed_when: "'Up/On' not in ipmi_poweron.stdout"
 
+    - name: Wait 60 seconds for IPMI power-on to complete and boot sequence to start
+      pause:
+        seconds: 60
+
     - name: Wait for host to become reachable via SSH
       wait_for:
         host: "{{ ssh_host }}"
