@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-Environment="ANSIBLE_CONFIG=/home/luca/Scripts/ansible.cfg"
+Environment="ANSIBLE_CONFIG=/home/luca/Scripts/ansible_super.cfg"
 ExecStart=/usr/bin/ansible-playbook -i /home/luca/Scripts/inventory.ini /home/luca/Scripts/super_on.yaml 
 RemainAfterExit=false
 StandardOutput=journal
