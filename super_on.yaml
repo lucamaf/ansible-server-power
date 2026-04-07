@@ -19,16 +19,17 @@
       register: ipmi_poweron
       changed_when: "'Up/On' not in ipmi_poweron.stdout"
 
-    - name: Wait 60 seconds for IPMI power-on to complete and boot sequence to start
+    - name: Wait 120 seconds for IPMI power-on to complete and boot sequence to start
       pause:
-        seconds: 60
+        seconds: 120
 
     - name: Wait for host to become reachable via SSH
-      wait_for:
-        host: "{{ ssh_host }}"
-        port: 22
-        timeout: 300
-        state: started
+      become: false
+      shell: ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no {{ ssh_user }}@{{ ssh_host }} echo "SSH is ready"
+      register: ssh_check
+      until: ssh_check.rc == 0
+      retries: 30
+      delay: 10
       delegate_to: localhost
 
 - name: Startup all VMs on OCP hosts
