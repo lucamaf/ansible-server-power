@@ -20,8 +20,20 @@
       shell: virsh list --name
       register: remaining_vms
       until: remaining_vms.stdout_lines | select('match', '.+') | list | length == 0
-      retries: 30
-      delay: 10
+      retries: 60
+      delay: 15
+      ignore_errors: true
+
+    - name: Get any VMs still running after graceful wait
+      shell: virsh list --name
+      register: stubborn_vms
+      changed_when: false
+
+    - name: Force off any VMs that did not shut down gracefully
+      shell: virsh destroy {{ item }}
+      loop: "{{ stubborn_vms.stdout_lines }}"
+      when: item != ""
+      ignore_errors: true
 
     - name: Call API to turn off monitoring
       uri:
